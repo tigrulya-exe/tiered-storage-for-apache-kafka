@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##
-IMAGE_TAG = ivanyuaiven/kafka:3.0-2022-03-31-tiered-storage-1-ursm-2
+IMAGE_TAG = ivanyuaiven/kafka:3.3-2022-10-06-tiered-storage-1-ursm-2
 
 .PHONY: clean
 clean:

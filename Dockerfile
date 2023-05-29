@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##
-FROM ivanyuaiven/kafka:3.0-2022-03-31-tiered-storage-1
+FROM ivanyuaiven/kafka:3.3-2022-10-06-tiered-storage-1
 
 COPY commons/build/distributions/commons-0.0.1-SNAPSHOT.tar /ursm/commons-0.0.1-SNAPSHOT.tar
 RUN cd /ursm \
