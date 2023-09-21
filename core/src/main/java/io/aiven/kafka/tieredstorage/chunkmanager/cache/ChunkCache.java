@@ -29,10 +29,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.kafka.common.Configurable;
 
+import io.aiven.kafka.tieredstorage.Chunk;
 import io.aiven.kafka.tieredstorage.chunkmanager.ChunkKey;
 import io.aiven.kafka.tieredstorage.chunkmanager.ChunkManager;
 import io.aiven.kafka.tieredstorage.manifest.SegmentManifest;
 import io.aiven.kafka.tieredstorage.metrics.CaffeineStatsCounter;
+import io.aiven.kafka.tieredstorage.storage.BytesRange;
 import io.aiven.kafka.tieredstorage.storage.ObjectKey;
 import io.aiven.kafka.tieredstorage.storage.StorageBackendException;
 
@@ -52,6 +54,8 @@ public abstract class ChunkCache<T> implements ChunkManager, Configurable {
     final CaffeineStatsCounter statsCounter;
 
     protected AsyncCache<ChunkKey, T> cache;
+
+    private int prefetchingSize;
 
     protected ChunkCache(final ChunkManager chunkManager) {
         this.chunkManager = chunkManager;
@@ -128,6 +132,7 @@ public abstract class ChunkCache<T> implements ChunkManager, Configurable {
     public abstract Weigher<ChunkKey, T> weigher();
 
     protected AsyncCache<ChunkKey, T> buildCache(final ChunkCacheConfig config) {
+        this.prefetchingSize = config.cachePrefetchingSize();
         final Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder();
         config.cacheSize().ifPresent(maximumWeight -> cacheBuilder.maximumWeight(maximumWeight).weigher(weigher()));
         config.cacheRetention().ifPresent(cacheBuilder::expireAfterAccess);
@@ -138,5 +143,30 @@ public abstract class ChunkCache<T> implements ChunkManager, Configurable {
             .buildAsync();
         statsCounter.registerSizeMetric(cache.synchronous()::estimatedSize);
         return cache;
+    }
+
+    public void startPrefetching(final ObjectKey segmentKey,
+                                 final SegmentManifest segmentManifest,
+                                 final int startPosition) {
+        final BytesRange prefetchingRange;
+        if (Integer.MAX_VALUE - startPosition < prefetchingSize) {
+            prefetchingRange = BytesRange.of(startPosition, Integer.MAX_VALUE);
+        } else {
+            prefetchingRange = BytesRange.of(startPosition, startPosition + prefetchingSize);
+        }
+        final var chunks = segmentManifest.chunkIndex().listChunksForRange(prefetchingRange);
+        chunks.forEach(chunk -> {
+            final ChunkKey chunkKey = new ChunkKey(segmentKey.value(), chunk.id);
+            cache.asMap()
+                .computeIfAbsent(chunkKey, key -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        final InputStream chunkStream =
+                            chunkManager.getChunk(segmentKey, segmentManifest, chunk.id);
+                        return this.cacheChunk(chunkKey, chunkStream);
+                    } catch (final StorageBackendException | IOException e) {
+                        throw new CompletionException(e);
+                    }
+                }, executor));
+        });
     }
 }
