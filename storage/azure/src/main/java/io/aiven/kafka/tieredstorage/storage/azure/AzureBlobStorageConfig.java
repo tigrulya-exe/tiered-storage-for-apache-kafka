@@ -25,7 +25,6 @@ import org.apache.kafka.common.config.types.Password;
 
 import io.aiven.kafka.tieredstorage.config.validators.NonEmptyPassword;
 import io.aiven.kafka.tieredstorage.config.validators.Null;
-import io.aiven.kafka.tieredstorage.config.validators.ValidUrl;
 
 public class AzureBlobStorageConfig extends AbstractConfig {
     static final String AZURE_ACCOUNT_NAME_CONFIG = "azure.account.name";
@@ -50,9 +49,9 @@ public class AzureBlobStorageConfig extends AbstractConfig {
         CONFIG = new ConfigDef()
             .define(
                 AZURE_ACCOUNT_NAME_CONFIG,
-                ConfigDef.Type.STRING,
+                ConfigDef.Type.PASSWORD,
                 null,
-                Null.or(new ConfigDef.NonEmptyString()),
+                Null.or(new NonEmptyPassword()),
                 ConfigDef.Importance.HIGH,
                 AZURE_ACCOUNT_NAME_DOC)
             .define(
@@ -64,16 +63,16 @@ public class AzureBlobStorageConfig extends AbstractConfig {
                 AZURE_ACCOUNT_KEY_DOC)
             .define(
                 AZURE_CONTAINER_NAME_CONFIG,
-                ConfigDef.Type.STRING,
+                ConfigDef.Type.PASSWORD,
                 ConfigDef.NO_DEFAULT_VALUE,
-                new ConfigDef.NonEmptyString(),
+                new NonEmptyPassword(),
                 ConfigDef.Importance.HIGH,
                 AZURE_CONTAINER_NAME_DOC)
             .define(
                 AZURE_ENDPOINT_URL_CONFIG,
-                ConfigDef.Type.STRING,
+                ConfigDef.Type.PASSWORD,
                 null,
-                Null.or(new ValidUrl()),
+                Null.or(new NonEmptyPassword()),
                 ConfigDef.Importance.LOW,
                 AZURE_ENDPOINT_URL_DOC)
             .define(
