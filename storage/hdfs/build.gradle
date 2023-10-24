@@ -20,9 +20,10 @@ dependencies {
     implementation project(":storage:core")
 
     implementation "commons-io:commons-io:$apacheCommonsIOVersion"
+    implementation "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    implementation "org.apache.hadoop:hadoop-hdfs-client:$hadoopVersion"
 
-    implementation "org.apache.hadoop:hadoop-common:3.2.4"
-    implementation "org.apache.hadoop:hadoop-hdfs-client:3.2.4"
-
+    testImplementation "org.apache.hadoop:hadoop-minicluster:$hadoopVersion"
+    testImplementation "junit:junit:4.13.2"
     testImplementation(testFixtures(project(":storage:core")))
 }
