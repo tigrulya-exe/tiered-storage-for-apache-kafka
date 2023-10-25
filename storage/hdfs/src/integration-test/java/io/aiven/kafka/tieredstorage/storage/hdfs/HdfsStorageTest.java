@@ -27,9 +27,7 @@ import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import static io.aiven.kafka.tieredstorage.storage.hdfs.HdfsStorageConfig.HDFS_CORE_SITE_CONFIG;
 import static io.aiven.kafka.tieredstorage.storage.hdfs.HdfsStorageConfig.HDFS_ROOT_CONFIG;
-import static io.aiven.kafka.tieredstorage.storage.hdfs.HdfsStorageConfig.HDFS_SITE_CONFIG;
 
 public class HdfsStorageTest extends BaseStorageTest {
 

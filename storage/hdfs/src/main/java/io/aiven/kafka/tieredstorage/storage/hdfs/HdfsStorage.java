@@ -50,10 +50,10 @@ public class HdfsStorage implements StorageBackend {
             fileSystem = FileSystem.get(config.hadoopConf());
 
             final Path rootDirectory = new Path(config.rootDirectory());
-            fileSystem.mkdirs(rootDirectory);
+            mkdirIfNotExists(rootDirectory);
             fileSystem.setWorkingDirectory(rootDirectory);
 
-            absoluteRootPath = fileSystem.getFileStatus(rootDirectory).getPath().toString();
+            absoluteRootPath = fileSystem.makeQualified(rootDirectory).toString();
         } catch (final IOException exception) {
             throw new RuntimeException("Can't create Hadoop filesystem with provided config",
                 exception);
@@ -66,7 +66,7 @@ public class HdfsStorage implements StorageBackend {
 
         final Path filePath = new Path(key.value());
         try {
-            fileSystem.mkdirs(filePath.getParent());
+            mkdirIfNotExists(filePath.getParent());
             try (FSDataOutputStream fsDataOutputStream = fileSystem.create(filePath, true)) {
                 return IOUtils.copy(inputStream, fsDataOutputStream, uploadBufferSize);
             }
@@ -125,5 +125,11 @@ public class HdfsStorage implements StorageBackend {
         return "HdfsStorage{"
             + "root='" + absoluteRootPath + '\''
             + '}';
+    }
+
+    private void mkdirIfNotExists(final Path path) throws IOException {
+        if (!fileSystem.exists(path)) {
+            fileSystem.mkdirs(path);
+        }
     }
 }

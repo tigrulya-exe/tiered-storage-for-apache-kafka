@@ -18,11 +18,18 @@ package io.aiven.kafka.tieredstorage.storage.hdfs;
 
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.hadoop.conf.Configuration;
+
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class HdfsStorageConfig extends AbstractConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(HdfsStorageConfig.class);
+
     private static final ConfigDef CONFIG;
 
     static final String HDFS_CONF_PREFIX = "hdfs.conf.";
@@ -109,15 +116,20 @@ class HdfsStorageConfig extends AbstractConfig {
                 entry.getValue().toString()
             ));
 
+        LOG.info("<-------- BUILT CONFIG BEFORE RESOURCES: {}", hadoopConf.getPropsWithPrefix(""));
+
         addResourceIfPresent(hadoopConf, HDFS_CORE_SITE_CONFIG);
         addResourceIfPresent(hadoopConf, HDFS_SITE_CONFIG);
+
+        LOG.info("<-------- BUILT CONFIG: {}", hadoopConf.getPropsWithPrefix(""));
+
         return hadoopConf;
     }
 
     private void addResourceIfPresent(final Configuration hadoopConf, final String configKey) {
         final String resource = getString(configKey);
         if (resource != null) {
-            hadoopConf.addResource(resource);
+            hadoopConf.addResource(new Path("file", null, resource));
         }
     }
 
