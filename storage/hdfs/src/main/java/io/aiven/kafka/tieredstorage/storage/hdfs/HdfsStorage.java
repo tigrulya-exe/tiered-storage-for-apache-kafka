@@ -19,6 +19,7 @@ package io.aiven.kafka.tieredstorage.storage.hdfs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
 import io.aiven.kafka.tieredstorage.storage.BytesRange;
@@ -34,13 +35,14 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsAction;
 
 public class HdfsStorage implements StorageBackend {
 
-    private FileSystem fileSystem;
-
     private int uploadBufferSize;
     private String absoluteRootPath;
+
+    private FileSystem fileSystem;
 
     @Override
     public void configure(final Map<String, ?> configs) {
@@ -50,7 +52,7 @@ public class HdfsStorage implements StorageBackend {
             fileSystem = FileSystem.get(config.hadoopConf());
 
             final Path rootDirectory = new Path(config.rootDirectory());
-            mkdirIfNotExists(rootDirectory);
+            validateRootDir(rootDirectory);
             fileSystem.setWorkingDirectory(rootDirectory);
 
             absoluteRootPath = fileSystem.makeQualified(rootDirectory).toString();
@@ -65,8 +67,12 @@ public class HdfsStorage implements StorageBackend {
         throws StorageBackendException {
 
         final Path filePath = new Path(key.value());
+        final Path containingDirectory = filePath.getParent();
         try {
-            mkdirIfNotExists(filePath.getParent());
+            if (!fileSystem.exists(containingDirectory)) {
+                fileSystem.mkdirs(containingDirectory);
+            }
+
             try (FSDataOutputStream fsDataOutputStream = fileSystem.create(filePath, true)) {
                 return IOUtils.copy(inputStream, fsDataOutputStream, uploadBufferSize);
             }
@@ -127,9 +133,16 @@ public class HdfsStorage implements StorageBackend {
             + '}';
     }
 
-    private void mkdirIfNotExists(final Path path) throws IOException {
-        if (!fileSystem.exists(path)) {
+    private void validateRootDir(final Path path) throws IOException {
+        try {
+            if (!fileSystem.getFileStatus(path).isDirectory()) {
+                throw new IllegalArgumentException(path + " must be a directory");
+            }
+            fileSystem.access(path, FsAction.WRITE);
+        } catch (final FileNotFoundException exception) {
             fileSystem.mkdirs(path);
+        } catch (final AccessDeniedException exception) {
+            throw new IllegalArgumentException(path + "must be a writable directory");
         }
     }
 }

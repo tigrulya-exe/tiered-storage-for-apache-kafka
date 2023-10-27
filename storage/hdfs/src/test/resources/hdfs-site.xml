@@ -19,8 +19,13 @@
 <configuration>
 
   <property>
-    <name>fs.defaultFS</name>
-    <value>hdfs://namenode</value>
+    <name>dfs.replication</name>
+    <value>1</value>
+  </property>
+
+  <property>
+    <name>my.hdfs.site.config.key</name>
+    <value>my.hdfs.site.config.value</value>
   </property>
 
 </configuration>

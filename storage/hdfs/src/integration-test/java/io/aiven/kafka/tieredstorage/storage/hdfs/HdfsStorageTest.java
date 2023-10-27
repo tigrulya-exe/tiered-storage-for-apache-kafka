@@ -27,7 +27,9 @@ import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import static io.aiven.kafka.tieredstorage.storage.hdfs.HdfsStorageConfig.HDFS_CONF_PREFIX;
 import static io.aiven.kafka.tieredstorage.storage.hdfs.HdfsStorageConfig.HDFS_ROOT_CONFIG;
+import static org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY;
 
 public class HdfsStorageTest extends BaseStorageTest {
 
@@ -51,9 +53,7 @@ public class HdfsStorageTest extends BaseStorageTest {
         final HdfsStorage hdfsStorage = new HdfsStorage();
         final Map<String, Object> storeConfig = Map.of(
             HDFS_ROOT_CONFIG, "/tmp/test/",
-            "hdfs.conf.fs.defaultFS", miniDfsCluster.getURI()
-//            HDFS_CORE_SITE_CONFIG, "",
-//            HDFS_SITE_CONFIG, ""
+            HDFS_CONF_PREFIX + FS_DEFAULT_NAME_KEY, miniDfsCluster.getURI()
         );
         hdfsStorage.configure(storeConfig);
         return hdfsStorage;

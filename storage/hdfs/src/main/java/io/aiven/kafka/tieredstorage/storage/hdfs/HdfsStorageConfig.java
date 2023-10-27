@@ -24,12 +24,8 @@ import org.apache.kafka.common.config.ConfigDef;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class HdfsStorageConfig extends AbstractConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(HdfsStorageConfig.class);
-
     private static final ConfigDef CONFIG;
 
     static final String HDFS_CONF_PREFIX = "hdfs.conf.";
@@ -37,18 +33,19 @@ class HdfsStorageConfig extends AbstractConfig {
     static final String HDFS_ROOT_CONFIG = "hdfs.root";
     private static final String HDFS_ROOT_DEFAULT = "/";
     private static final String HDFS_ROOT_DOC =
-        "The base directory path in hdfs relative to which all uploaded file paths are resolved ";
+        "The base directory path in HDFS relative to which all uploaded file paths will be resolved";
 
     static final String HDFS_UPLOAD_BUFFER_SIZE_CONFIG = "hdfs.upload.buffer.size";
     private static final int HDFS_UPLOAD_BUFFER_SIZE_DEFAULT = 8192;
-    private static final String HDFS_UPLOAD_BUFFER_SIZE_DOC =
-        "TODO";
+    private static final String HDFS_UPLOAD_BUFFER_SIZE_DOC =  "Size of the buffer used during file upload";
 
     static final String HDFS_CORE_SITE_CONFIG = "hdfs.core-site.path";
-    private static final String HDFS_CORE_SITE_DOC = "Path of core-site.xml";
+    private static final String HDFS_CORE_SITE_DOC = "Absolute path of core-site.xml";
 
-    static final String HDFS_SITE_CONFIG = "hdfs.hdfs-site.path";
-    private static final String HDFS_SITE_DOC = "Path of hdfs-site.xml";
+    static final String HDFS_HDFS_SITE_CONFIG = "hdfs.hdfs-site.path";
+    private static final String HDFS_SITE_DOC = "Absolute path of hdfs-site.xml";
+
+    private final Configuration hadoopConf;
 
     static {
         CONFIG = new ConfigDef()
@@ -77,7 +74,7 @@ class HdfsStorageConfig extends AbstractConfig {
                 HDFS_CORE_SITE_DOC
             )
             .define(
-                HDFS_SITE_CONFIG,
+                    HDFS_HDFS_SITE_CONFIG,
                 ConfigDef.Type.STRING,
                 null,
                 new ConfigDef.NonEmptyString(),
@@ -85,8 +82,6 @@ class HdfsStorageConfig extends AbstractConfig {
                 HDFS_SITE_DOC
             );
     }
-
-    private final Configuration hadoopConf;
 
     HdfsStorageConfig(final Map<String, ?> props) {
         super(CONFIG, removeHadoopConfProps(props));
@@ -116,13 +111,8 @@ class HdfsStorageConfig extends AbstractConfig {
                 entry.getValue().toString()
             ));
 
-        LOG.info("<-------- BUILT CONFIG BEFORE RESOURCES: {}", hadoopConf.getPropsWithPrefix(""));
-
         addResourceIfPresent(hadoopConf, HDFS_CORE_SITE_CONFIG);
-        addResourceIfPresent(hadoopConf, HDFS_SITE_CONFIG);
-
-        LOG.info("<-------- BUILT CONFIG: {}", hadoopConf.getPropsWithPrefix(""));
-
+        addResourceIfPresent(hadoopConf, HDFS_HDFS_SITE_CONFIG);
         return hadoopConf;
     }
 

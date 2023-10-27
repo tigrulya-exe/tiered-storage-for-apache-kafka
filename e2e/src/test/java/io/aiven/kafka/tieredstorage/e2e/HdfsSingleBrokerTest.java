@@ -47,6 +47,7 @@ public class HdfsSingleBrokerTest extends SingleBrokerTest {
     private static final int NAME_NODE_PORT = 8020;
     private static final int NAME_NODE_UI_PORT = 9870;
     private static final int DATA_NODE_PORT = 9867;
+
     private static final String NAME_NODE_NETWORK_ALIAS = "namenode";
     private static final String DATA_NODE_NETWORK_ALIAS = "datanode";
     private static final String HDFS_WORKING_DIRECTORY = "/tmp/kafka/";
@@ -77,7 +78,7 @@ public class HdfsSingleBrokerTest extends SingleBrokerTest {
             .withNetwork(NETWORK)
             .withNetworkAliases(DATA_NODE_NETWORK_ALIAS)
             .waitingFor(Wait.forListeningPorts(DATA_NODE_PORT))
-            .withStartupTimeout(Duration.of(5, ChronoUnit.MINUTES))
+            .withStartupTimeout(Duration.of(3, ChronoUnit.MINUTES))
             .withEnv(HADOOP_CONTAINER_ENV);
 
     private static FileSystem fileSystem;
@@ -128,7 +129,6 @@ public class HdfsSingleBrokerTest extends SingleBrokerTest {
     @Override
     boolean assertNoTopicDataOnTierStorage(final String topicName, final Uuid topicId) {
         final String prefix = String.format("%s-%s", topicName, topicId.toString());
-
         try {
             return !fileSystem.listFiles(new Path(prefix), true).hasNext();
         } catch (final IOException e) {

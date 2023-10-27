@@ -23,4 +23,9 @@
     <value>hdfs://namenode</value>
   </property>
 
+  <property>
+    <name>my.core.site.config.key</name>
+    <value>my.core.site.config.value</value>
+  </property>
+
 </configuration>
