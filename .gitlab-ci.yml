@@ -1,0 +1,5 @@
+include:
+  - project: "arenadata/infrastructure/code/ci/gitlab_ci_files"
+    ref: master
+    file: "/development/java/tiered-storage-for-apache-kafka.yml"
+
