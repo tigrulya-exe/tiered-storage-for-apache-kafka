@@ -124,6 +124,8 @@ subprojects {
         testcontainersVersion = "1.19.0"
 
         testcontainersFakeGcsServerVersion = "0.2.0"
+
+        hadoopVersion = "3.2.4"
     }
 
     dependencies {
