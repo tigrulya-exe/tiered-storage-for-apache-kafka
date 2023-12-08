@@ -99,6 +99,10 @@ fill_topic:
 run_local_fs:
 	docker compose -f compose-local-fs.yml up
 
+.PHONY: run_local_fs_with_zookeeper
+run_local_fs_with_zookeeper:
+	docker compose -f compose-local-fs-zookeeper.yml up
+
 .PHONY: run_s3_aws
 run_s3_aws:
 	docker compose -f compose-s3-aws.yml up
@@ -122,6 +126,7 @@ run_hdfs:
 .PHONY: clean
 clean:
 	docker compose -f compose-local-fs.yml down
+	docker compose -f compose-local-fs-zookeeper.yml down
 	docker compose -f compose-s3-aws.yml down
 	docker compose -f compose-s3-minio.yml down
 	docker compose -f compose-gcs-fake-gcs-server.yml down
@@ -164,6 +169,12 @@ namenode_container = hdfs_ts_namenode
 show_remote_data_hdfs:
 	docker exec $(namenode_container) \
 		hdfs dfs -ls '/tmp/kafka/tiered-storage-demo/$(topic)-*/0/'
+
+zookeeper_container=kafka-ts-zookeeper
+.PHONY: show_remote_metadata_zookeeper
+show_remote_metadata_zookeeper:
+	docker exec $(zookeeper_container) \
+		zookeeper-shell zookeeper ls -R /kafka/remote-metadata
 
 offset = 0
 consume = 10

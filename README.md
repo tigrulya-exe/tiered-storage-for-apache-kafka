@@ -10,7 +10,11 @@ The project follows the API specifications according to the latest version of [K
 
 See the [demo/](demo/) directory.
 
-## Design
+## Remote Metadata Storage Design
+
+See the [RemoteLogMetadataManager docs](docs/RemoteLogMetadataManager.md).
+
+## Remote Storage Design
 
 ### Requirements
 
