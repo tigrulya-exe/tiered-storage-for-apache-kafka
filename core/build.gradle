@@ -31,6 +31,7 @@ ext {
 
 dependencies {
     implementation project(":storage:core")
+    implementation project(":metadata-storage:core")
 
     // These dependencies are load via specific classloader, only check collisions with inner dependencies (e.g. storage)
 

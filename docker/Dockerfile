@@ -23,7 +23,8 @@ RUN mkdir -p /tiered-storage-for-apache-kafka/core \
     &&  mkdir -p /tiered-storage-for-apache-kafka/s3 \
     &&  mkdir -p /tiered-storage-for-apache-kafka/gcs \
     &&  mkdir -p /tiered-storage-for-apache-kafka/hdfs \
-    &&  mkdir -p /tiered-storage-for-apache-kafka/azure
+    &&  mkdir -p /tiered-storage-for-apache-kafka/azure \
+    &&  mkdir -p /tiered-storage-for-apache-kafka/metadata/zookeeper
 
 COPY build/distributions/tiered-storage-for-apache-kafka-${_VERSION}.tgz /tiered-storage-for-apache-kafka/core
 RUN cd /tiered-storage-for-apache-kafka/core \
@@ -49,6 +50,11 @@ COPY storage/hdfs/build/distributions/hdfs-${_VERSION}.tgz /tiered-storage-for-a
 RUN cd /tiered-storage-for-apache-kafka/hdfs \
     && tar -xf hdfs-${_VERSION}.tgz --strip-components=1 \
     && rm hdfs-${_VERSION}.tgz
+
+COPY metadata-storage/zookeeper/build/distributions/zookeeper-${_VERSION}.tgz /tiered-storage-for-apache-kafka/metadata/zookeeper
+RUN cd /tiered-storage-for-apache-kafka/metadata/zookeeper \
+    && tar -xf zookeeper-${_VERSION}.tgz --strip-components=1 \
+    && rm zookeeper-${_VERSION}.tgz
 
 # Installing JMX exporter agent
 ARG JMX_EXPORTER_VERSION=0.18.0

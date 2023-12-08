@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Aiven Oy
+ * Copyright 2023 Aiven Oy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-rootProject.name = 'tiered-storage-for-apache-kafka'
-include 'core'
-include 'storage'
-include 'storage:core'
-include 'storage:filesystem'
-include 'storage:azure'
-include 'storage:gcs'
-include 'storage:s3'
-include 'storage:hdfs'
-include 'e2e'
-include 'commons'
-include 'metadata-storage'
-include 'metadata-storage:core'
-include 'metadata-storage:zookeeper'
+package io.aiven.kafka.tieredstorage.metadata;
+
+public class MetadataNotFoundException extends MetadataStorageBackendException {
+    public MetadataNotFoundException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public MetadataNotFoundException(final String message) {
+        super(message);
+    }
+}

@@ -131,11 +131,13 @@ subprojects {
     dependencies {
         compileOnly "org.apache.kafka:kafka-clients:$kafkaVersion"
         compileOnly "org.apache.kafka:kafka-storage-api:$kafkaVersion"
+        compileOnly "org.apache.kafka:kafka-storage:$kafkaVersion"
 
         compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
 
         testImplementation "org.apache.kafka:kafka-clients:$kafkaVersion"
         testImplementation "org.apache.kafka:kafka-storage-api:$kafkaVersion"
+        testImplementation "org.apache.kafka:kafka-storage:$kafkaVersion"
 
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"

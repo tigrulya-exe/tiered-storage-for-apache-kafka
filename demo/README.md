@@ -45,6 +45,41 @@ make show_local_data
 make consume
 ```
 
+### Local filesystem as "remote" storage with zookeeper as metadata remote storage: `compose-local-fs-zookeeper.yml`
+
+This scenario uses `FileSystemStorage` as the "remote" storage and `ZookeeperMetadataStorage` as the metadata storage.
+
+```bash
+# Start the compose
+make run_local_fs_with_zookeeper
+
+# Create the topic with any variation
+make create_topic_by_size_ts
+# or
+# make create_topic_by_time_ts
+# or with TS disabled
+# make create_topic_*_no_ts
+
+# Fill the topic
+make fill_topic
+
+# See that segments are uploaded to the remote storage
+# (this may take several seconds)
+make show_remote_data_fs
+
+# See that segments metadata are uploaded to the remote metadata storage
+# (this may take several seconds)
+make show_remote_metadata_zookeeper
+
+# Check that early segments are deleted
+# (completely or renamed with `.deleted` suffix)
+# from the local storage (this may take several seconds)
+make show_local_data
+
+# Check the data is consumable
+make consume
+```
+
 ### AWS S3 as remote storage: `compose-s3-aws.yml`
 
 This scenario uses `S3Storage` with the real AWS S3 as the remote storage.
